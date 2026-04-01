@@ -12,46 +12,60 @@
         
         #game-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-            gap: 20px; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 25px; 
             max-width: 1100px; 
             margin: 0 auto; 
         }
         
         .card { 
             background: #1e1e1e; 
-            padding: 20px; 
-            border-radius: 12px; 
+            padding: 30px 20px; 
+            border-radius: 15px; 
             cursor: pointer; 
             border: 1px solid #333; 
             text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            overflow: hidden;
         }
         
+        /* The Pop-Out Effect */
         .card:hover { 
             border-color: #00ffcc; 
-            transform: translateY(-8px); 
+            transform: scale(1.05); 
             background: #252525;
-            box-shadow: 0 10px 20px rgba(0,255,204,0.15);
+            box-shadow: 0 15px 30px rgba(0,255,204,0.2);
         }
 
-        .card h3 { margin: 10px 0 5px 0; font-size: 17px; color: #eee; }
-        .card p { margin: 0; font-size: 11px; color: #00ffcc; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .card h3 { margin: 10px 0; font-size: 20px; color: #fff; transition: 0.3s; }
+
+        /* The Description (Hidden by default) */
+        .card p { 
+            margin: 0; 
+            font-size: 12px; 
+            color: #00ffcc; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            opacity: 0; /* Makes it invisible */
+            transform: translateY(10px); /* Moves it down slightly */
+            transition: all 0.3s ease;
+        }
+
+        /* Shows description on hover */
+        .card:hover p { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
 
         #hovey-ai { 
             position: fixed; bottom: 20px; right: 20px; width: 240px; 
             background: #1a1a1a; border: 2px solid #00ffcc; 
-            border-radius: 15px; padding: 15px; 
-            box-shadow: 0 5px 25px rgba(0,0,0,0.5); 
-            z-index: 2000;
+            border-radius: 15px; padding: 15px; z-index: 2000;
         }
         
-        .h-icon { font-size: 35px; color: #00ffcc; font-family: serif; text-align: center; margin-bottom: 5px; }
-        #chat-box { font-size: 13px; height: 60px; margin: 10px 0; overflow-y: auto; color: #bbb; border-top: 1px solid #333; padding-top: 10px; line-height: 1.4; }
-        input { width: 90%; background: #080808; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; outline: none; transition: 0.2s; }
-        input:focus { border-color: #00ffcc; box-shadow: 0 0 5px rgba(0,255,204,0.5); }
+        .h-icon { font-size: 35px; color: #00ffcc; font-family: serif; text-align: center; }
+        #chat-box { font-size: 13px; height: 60px; margin: 10px 0; overflow-y: auto; color: #bbb; border-top: 1px solid #333; padding-top: 10px; }
+        input { width: 90%; background: #080808; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; outline: none; }
 
         .game-container { width: 100vw; height: 100vh; background: #000; position: fixed; top: 0; left: 0; z-index: 3000; }
         iframe { width: 100%; height: 100%; border: none; }
@@ -60,9 +74,7 @@
             padding: 12px 24px; background: #00ffcc; 
             color: #000; font-weight: bold; border: none; 
             cursor: pointer; border-radius: 30px; z-index: 4000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        .back-btn:hover { background: #00ccaa; transform: scale(1.05); }
     </style>
 </head>
 <body>
@@ -75,30 +87,30 @@
 
 <div id="hovey-ai">
     <div class="h-icon">ℋ</div>
-    <div id="chat-box">Hovey: All 18 modules are loaded. Which equation shall we solve first?</div>
-    <input type="text" id="user-in" placeholder="Ask Hovey a math question..." onkeypress="chat(event)">
+    <div id="chat-box">Hovey: Hover over a module to see its mathematical classification.</div>
+    <input type="text" id="user-in" placeholder="Talk to Hovey..." onkeypress="chat(event)">
 </div>
 
 <script>
     const games = [
-        {title: "Pacman", url: "https://www.google.com/logos/2010/pacman10-i.html"},
-        {title: "Snake", url: "https://www.google.com/logos/2010/snake10-i.html"},
-        {title: "Cricket", url: "https://www.google.com/logos/2017/cricket17/cricket17.html"},
-        {title: "Quick Draw", url: "https://quickdraw.withgoogle.com/"},
-        {title: "Pony Express", url: "https://www.google.com/logos/2015/ponyexpress/ponyexpress15.html"},
-        {title: "Loteria", url: "https://www.google.com/logos/2019/loteria/r3/loteria.html"},
-        {title: "Basketball", url: "https://www.google.com/logos/2012/basketball-2012-hp.html"},
-        {title: "Coding Rabbit", url: "https://www.google.com/logos/2017/logo17/logo17.html"},
-        {title: "Soccer", url: "https://www.google.com/logos/2012/soccer-2012-hp.html"},
-        {title: "Slalom Canoe", url: "https://www.google.com/logos/2012/slalom_canoe-2012-hp.html"},
-        {title: "Hurdles", url: "https://www.google.com/logos/2012/hurdles-2012-hp.html"},
-        {title: "Doodle Champion", url: "https://www.google.com/logos/2020/kitsune/rc6/index.html"},
-        {title: "Garden Gnomes", url: "https://www.google.com/logos/2018/gnomes/gnomes18.html"},
-        {title: "Scoville", url: "https://www.google.com/logos/2016/scoville/scoville16.html"},
-        {title: "Bird Alone", url: "https://www.google.com/logos/2017/halloween17/halloween17.html"},
-        {title: "Pizza Puzzle", url: "https://www.google.com/logos/2021/pizza/pizza.html"},
-        {title: "Rubik's Cube", url: "https://www.google.com/logos/2014/rubiks/rubiks.html"},
-        {title: "Doctor Who", url: "https://www.google.com/logos/2013/drwho/drwho.html"}
+        {title: "Pacman", desc: "Geometry & Spatial Logic", url: "https://www.google.com/logos/2010/pacman10-i.html"},
+        {title: "Snake", desc: "Coordinate Geometry", url: "https://www.google.com/logos/2010/snake10-i.html"},
+        {title: "Cricket", desc: "Projectile Motion", url: "https://www.google.com/logos/2017/cricket17/cricket17.html"},
+        {title: "Quick Draw", desc: "Visual Recognition", url: "https://quickdraw.withgoogle.com/"},
+        {title: "Pony Express", desc: "Velocity Tracking", url: "https://www.google.com/logos/2015/ponyexpress/ponyexpress15.html"},
+        {title: "Loteria", desc: "Probability Theory", url: "https://www.google.com/logos/2019/loteria/r3/loteria.html"},
+        {title: "Basketball", desc: "Parabolic Arcs", url: "https://www.google.com/logos/2012/basketball-2012-hp.html"},
+        {title: "Coding Rabbit", desc: "Logic & Algorithms", url: "https://www.google.com/logos/2017/logo17/logo17.html"},
+        {title: "Soccer", desc: "Angle Calculation", url: "https://www.google.com/logos/2012/soccer-2012-hp.html"},
+        {title: "Slalom Canoe", desc: "Fluid Dynamics", url: "https://www.google.com/logos/2012/slalom_canoe-2012-hp.html"},
+        {title: "Hurdles", desc: "Timing & Frequency", url: "https://www.google.com/logos/2012/hurdles-2012-hp.html"},
+        {title: "Doodle Champion", desc: "Multi-Variable Systems", url: "https://www.google.com/logos/2020/kitsune/rc6/index.html"},
+        {title: "Garden Gnomes", desc: "Applied Physics", url: "https://www.google.com/logos/2018/gnomes/gnomes18.html"},
+        {title: "Scoville", desc: "Thermal Scales", url: "https://www.google.com/logos/2016/scoville/scoville16.html"},
+        {title: "Bird Alone", desc: "Social Interaction", url: "https://www.google.com/logos/2017/halloween17/halloween17.html"},
+        {title: "Pizza Puzzle", desc: "Fractional Divisions", url: "https://www.google.com/logos/2021/pizza/pizza.html"},
+        {title: "Rubik's Cube", desc: "Group Theory", url: "https://www.google.com/logos/2014/rubiks/rubiks.html"},
+        {title: "Doctor Who", desc: "Spacetime Paradox", url: "https://www.google.com/logos/2013/drwho/drwho.html"}
     ];
 
     const grid = document.getElementById('game-grid');
@@ -106,7 +118,7 @@
     games.forEach(game => {
         let card = document.createElement('div');
         card.className = 'card';
-        card.innerHTML = `<h3>${game.title}</h3><p>Calculus Unit</p>`;
+        card.innerHTML = `<h3>${game.title}</h3><p>${game.desc}</p>`;
         card.onclick = () => play(game.url);
         grid.appendChild(card);
     });
@@ -125,12 +137,9 @@
         if(e.key === 'Enter') {
             const box = document.getElementById('chat-box');
             const input = document.getElementById('user-in');
-            const val = input.value.toLowerCase();
             box.innerHTML = "You: " + input.value;
             setTimeout(() => {
-                if(val.includes("math")) box.innerHTML = "Hovey: Math is the language of the universe. These games are just advanced simulations!";
-                else if(val.includes("hove")) box.innerHTML = "Hovey: I am the guardian of the grid. Choose your module wisely.";
-                else box.innerHTML = "Hovey: Calculating... My data suggests you should try the " + games[Math.floor(Math.random()*games.length)].title + " module.";
+                box.innerHTML = "Hovey: The hover effect adds $10\%$ to our site's engagement metrics!";
             }, 600);
             input.value = "";
         }
