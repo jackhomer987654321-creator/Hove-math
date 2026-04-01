@@ -2,26 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hove Math</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3845/3845331.png">
     <style>
         body { background: #121212; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; overflow-x: hidden; }
-        nav { background: #1e1e1e; padding: 15px; border-bottom: 2px solid #00ffcc; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); position: sticky; top: 0; z-index: 1000; }
+        
+        nav { 
+            background: #1e1e1e; padding: 15px; border-bottom: 2px solid #00ffcc; 
+            text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); 
+            position: sticky; top: 0; z-index: 1000; 
+        }
         h1 { margin: 0; letter-spacing: 2px; color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.3); }
         
-        #main-content { padding: 20px; padding-bottom: 120px; }
+        #main-content { padding: 40px 20px; padding-bottom: 150px; }
         
         #game-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
-            gap: 25px; 
-            max-width: 1100px; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 30px; 
+            max-width: 1200px; 
             margin: 0 auto; 
         }
         
         .card { 
             background: #1e1e1e; 
-            padding: 30px 20px; 
-            border-radius: 15px; 
+            padding: 40px 20px; 
+            border-radius: 20px; 
             cursor: pointer; 
             border: 1px solid #333; 
             text-align: center;
@@ -29,51 +36,42 @@
             position: relative;
         }
         
-        /* The Pop-Out Effect */
         .card:hover { 
             border-color: #00ffcc; 
-            transform: scale(1.05); 
+            transform: scale(1.08); 
             background: #252525;
-            box-shadow: 0 15px 30px rgba(0,255,204,0.2);
+            box-shadow: 0 15px 40px rgba(0,255,204,0.25);
         }
 
-        .card h3 { margin: 10px 0; font-size: 20px; color: #fff; transition: 0.3s; }
+        .card h3 { margin: 10px 0; font-size: 22px; color: #fff; }
 
-        /* The Description (Hidden by default) */
         .card p { 
-            margin: 0; 
-            font-size: 12px; 
-            color: #00ffcc; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            opacity: 0; /* Makes it invisible */
-            transform: translateY(10px); /* Moves it down slightly */
+            margin: 0; font-size: 13px; color: #00ffcc; 
+            font-weight: bold; text-transform: uppercase; 
+            opacity: 0; transform: translateY(15px); 
             transition: all 0.3s ease;
         }
 
-        /* Shows description on hover */
-        .card:hover p { 
-            opacity: 1; 
-            transform: translateY(0); 
-        }
+        .card:hover p { opacity: 1; transform: translateY(0); }
 
         #hovey-ai { 
-            position: fixed; bottom: 20px; right: 20px; width: 240px; 
+            position: fixed; bottom: 20px; right: 20px; width: 260px; 
             background: #1a1a1a; border: 2px solid #00ffcc; 
             border-radius: 15px; padding: 15px; z-index: 2000;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.7);
         }
         
-        .h-icon { font-size: 35px; color: #00ffcc; font-family: serif; text-align: center; }
-        #chat-box { font-size: 13px; height: 60px; margin: 10px 0; overflow-y: auto; color: #bbb; border-top: 1px solid #333; padding-top: 10px; }
+        .h-icon { font-size: 40px; color: #00ffcc; font-family: serif; text-align: center; }
+        #chat-box { font-size: 13px; height: 70px; margin: 10px 0; overflow-y: auto; color: #bbb; border-top: 1px solid #333; padding-top: 10px; }
         input { width: 90%; background: #080808; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; outline: none; }
 
         .game-container { width: 100vw; height: 100vh; background: #000; position: fixed; top: 0; left: 0; z-index: 3000; }
         iframe { width: 100%; height: 100%; border: none; }
         .back-btn { 
-            position: absolute; top: 15px; left: 15px; 
-            padding: 12px 24px; background: #00ffcc; 
+            position: absolute; top: 20px; left: 20px; 
+            padding: 12px 25px; background: #00ffcc; 
             color: #000; font-weight: bold; border: none; 
-            cursor: pointer; border-radius: 30px; z-index: 4000;
+            cursor: pointer; border-radius: 50px; z-index: 4000;
         }
     </style>
 </head>
@@ -87,34 +85,33 @@
 
 <div id="hovey-ai">
     <div class="h-icon">ℋ</div>
-    <div id="chat-box">Hovey: Hover over a module to see its mathematical classification.</div>
-    <input type="text" id="user-in" placeholder="Talk to Hovey..." onkeypress="chat(event)">
+    <div id="chat-box">Hovey: The "New Tab" cloak is ready. Click away to vanish!</div>
+    <input type="text" id="user-in" placeholder="Ask a math question..." onkeypress="chat(event)">
 </div>
 
 <script>
     const games = [
-        {title: "Pacman", desc: "Geometry & Spatial Logic", url: "https://www.google.com/logos/2010/pacman10-i.html"},
-        {title: "Snake", desc: "Coordinate Geometry", url: "https://www.google.com/logos/2010/snake10-i.html"},
-        {title: "Cricket", desc: "Projectile Motion", url: "https://www.google.com/logos/2017/cricket17/cricket17.html"},
-        {title: "Quick Draw", desc: "Visual Recognition", url: "https://quickdraw.withgoogle.com/"},
-        {title: "Pony Express", desc: "Velocity Tracking", url: "https://www.google.com/logos/2015/ponyexpress/ponyexpress15.html"},
-        {title: "Loteria", desc: "Probability Theory", url: "https://www.google.com/logos/2019/loteria/r3/loteria.html"},
-        {title: "Basketball", desc: "Parabolic Arcs", url: "https://www.google.com/logos/2012/basketball-2012-hp.html"},
-        {title: "Coding Rabbit", desc: "Logic & Algorithms", url: "https://www.google.com/logos/2017/logo17/logo17.html"},
-        {title: "Soccer", desc: "Angle Calculation", url: "https://www.google.com/logos/2012/soccer-2012-hp.html"},
+        {title: "Pacman", desc: "Geometry Logic", url: "https://www.google.com/logos/2010/pacman10-i.html"},
+        {title: "Snake", desc: "Coordinate Systems", url: "https://www.google.com/logos/2010/snake10-i.html"},
+        {title: "Cricket", desc: "Projectile Physics", url: "https://www.google.com/logos/2017/cricket17/cricket17.html"},
+        {title: "Quick Draw", desc: "Pattern Recognition", url: "https://quickdraw.withgoogle.com/"},
+        {title: "Pony Express", desc: "Velocity Vectors", url: "https://www.google.com/logos/2015/ponyexpress/ponyexpress15.html"},
+        {title: "Loteria", desc: "Probability Math", url: "https://www.google.com/logos/2019/loteria/r3/loteria.html"},
+        {title: "Basketball", desc: "Parabolic Curves", url: "https://www.google.com/logos/2012/basketball-2012-hp.html"},
+        {title: "Coding Rabbit", desc: "Algorithmic Logic", url: "https://www.google.com/logos/2017/logo17/logo17.html"},
+        {title: "Soccer", desc: "Angular Momentum", url: "https://www.google.com/logos/2012/soccer-2012-hp.html"},
         {title: "Slalom Canoe", desc: "Fluid Dynamics", url: "https://www.google.com/logos/2012/slalom_canoe-2012-hp.html"},
-        {title: "Hurdles", desc: "Timing & Frequency", url: "https://www.google.com/logos/2012/hurdles-2012-hp.html"},
-        {title: "Doodle Champion", desc: "Multi-Variable Systems", url: "https://www.google.com/logos/2020/kitsune/rc6/index.html"},
+        {title: "Hurdles", desc: "Frequency Cycles", url: "https://www.google.com/logos/2012/hurdles-2012-hp.html"},
+        {title: "Doodle Island", desc: "Complex Systems", url: "https://www.google.com/logos/2020/kitsune/rc6/index.html"},
         {title: "Garden Gnomes", desc: "Applied Physics", url: "https://www.google.com/logos/2018/gnomes/gnomes18.html"},
-        {title: "Scoville", desc: "Thermal Scales", url: "https://www.google.com/logos/2016/scoville/scoville16.html"},
-        {title: "Bird Alone", desc: "Social Interaction", url: "https://www.google.com/logos/2017/halloween17/halloween17.html"},
-        {title: "Pizza Puzzle", desc: "Fractional Divisions", url: "https://www.google.com/logos/2021/pizza/pizza.html"},
+        {title: "Scoville", desc: "Thermal Analysis", url: "https://www.google.com/logos/2016/scoville/scoville16.html"},
+        {title: "Bird Alone", desc: "Behavioral Math", url: "https://www.google.com/logos/2017/halloween17/halloween17.html"},
+        {title: "Pizza Puzzle", desc: "Fractional Geometry", url: "https://www.google.com/logos/2021/pizza/pizza.html"},
         {title: "Rubik's Cube", desc: "Group Theory", url: "https://www.google.com/logos/2014/rubiks/rubiks.html"},
-        {title: "Doctor Who", desc: "Spacetime Paradox", url: "https://www.google.com/logos/2013/drwho/drwho.html"}
+        {title: "Doctor Who", desc: "Quantum Mechanics", url: "https://www.google.com/logos/2013/drwho/drwho.html"}
     ];
 
     const grid = document.getElementById('game-grid');
-
     games.forEach(game => {
         let card = document.createElement('div');
         card.className = 'card';
@@ -127,7 +124,7 @@
         const container = document.createElement('div');
         container.className = 'game-container';
         container.innerHTML = `
-            <button class="back-btn" onclick="location.reload()">← RETURN TO HOME</button>
+            <button class="back-btn" onclick="location.reload()">← BACK TO HOME</button>
             <iframe src="${url}"></iframe>
         `;
         document.body.appendChild(container);
@@ -139,10 +136,34 @@
             const input = document.getElementById('user-in');
             box.innerHTML = "You: " + input.value;
             setTimeout(() => {
-                box.innerHTML = "Hovey: The hover effect adds $10\%$ to our site's engagement metrics!";
+                box.innerHTML = "Hovey: Systems nominal. Stealth engaged.";
             }, 600);
             input.value = "";
         }
+    }
+
+    // --- STEALTH CLOAK: NEW TAB MODE ---
+    const originalTitle = "Hove Math";
+    const originalIcon = "https://cdn-icons-png.flaticon.com/512/3845/3845331.png";
+    const hiddenTitle = "New Tab";
+    const hiddenIcon = "https://www.google.com/favicon.ico"; // Standard Google/Chrome grey icon
+
+    window.addEventListener("blur", () => {
+        document.title = hiddenTitle;
+        updateIcon(hiddenIcon);
+    });
+
+    window.addEventListener("focus", () => {
+        document.title = originalTitle;
+        updateIcon(originalIcon);
+    });
+
+    function updateIcon(href) {
+        let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'shortcut icon';
+        link.href = href;
+        document.getElementsByTagName('head')[0].appendChild(link);
     }
 </script>
 </body>
